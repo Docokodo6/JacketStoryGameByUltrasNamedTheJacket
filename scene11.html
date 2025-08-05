@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>After Delivery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    #message {
+      font-size: 16px;
+      max-width: 80%;
+      white-space: pre-wrap;
+      animation: fadeIn 3s ease forwards;
+    }
+
+    #bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: url('After.jpg') no-repeat center center/cover;
+      z-index: -1;
+      filter: brightness(0.4);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="bg"></div>
+  <div id="message"></div>
+
+  <script>
+function goToNextGameplay() {
+  document.body.style.transition = "opacity 2s ease";
+  document.body.style.opacity = 0;
+  setTimeout(() => {
+    window.location.href = "scene10.html"; // next level!
+  }, 2000);
+}
+
+setTimeout(goToNextGameplay, 4000); // wait 12 secs or whatever fits your pacing
+    const finalWords = `
+"Miyu: "
+I want to be together again...please...just like before?...
+`;
+
+    let i = 0;
+    const msgBox = document.getElementById("message");
+
+    function typeEffect() {
+      if (i < finalWords.length) {
+        msgBox.textContent += finalWords.charAt(i);
+        i++;
+        setTimeout(typeEffect, 40);
+      }
+    }
+
+    window.onload = () => {
+      typeEffect();
+    };
+  </script>
+</body>
+</html>

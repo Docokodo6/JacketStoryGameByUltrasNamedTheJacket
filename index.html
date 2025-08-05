@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Background Music Frame</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+    }
+
+    /* Start screen overlay */
+    #startScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #startBtn {
+      font-size: 2em;
+      padding: 1em 2em;
+      background: #ffffff22;
+      border: 2px solid white;
+      color: white;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    #startBtn:hover {
+      background: #ffffff44;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Start screen -->
+  <div id="startScreen">
+    <button id="startBtn">🎮 Start Game</button>
+  </div>
+
+  <!-- Background music (only triggered by click) -->
+  <audio id="bgmusic" loop>
+    <source src="MP3.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Scene loader -->
+  <iframe src="scene1.html" name="mainframe"></iframe>
+
+  <script>
+    document.getElementById('startBtn').addEventListener('click', () => {
+      const music = document.getElementById('bgmusic');
+      music.play().catch(e => console.log("Autoplay error:", e));
+      document.getElementById('startScreen').style.display = 'none';
+    });
+  </script>
+
+</body>
+</html>

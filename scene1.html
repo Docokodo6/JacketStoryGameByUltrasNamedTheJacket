@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Deliver the Jacket</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #0d0d0d;
+      color: #fff;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background-color: #1a1a1a;
+      margin: auto;
+      border: 2px solid #333;
+      border-radius: 16px;
+      image-rendering: pixelated;
+    }
+#narratorBox {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background-color: rgba(20,20,20,0.9);
+    border: 2px solid #333;
+    border-radius: 12px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    gap: 16px;
+  }
+
+  #narratorImg {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  #narratorText {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #eee;
+    flex: 1;
+    min-height: 64px;
+    white-space: pre-wrap;
+  }
+
+    #startScreen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 5;
+    }
+    #startBtn {
+      padding: 12px 28px;
+      background-color: #222;
+      color: white;
+      border: 2px solid #555;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #logo {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 60px;
+      height: 60px;
+      background: url('Logo.jpg') no-repeat center/contain;
+    }
+    #joystick {
+      position: absolute;
+      bottom: 80px;
+      left: 20px;
+      width: 100px;
+      height: 100px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      touch-action: none;
+    }
+    #stick {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #aaa;
+      border-radius: 50%;
+      left: 30px;
+      top: 30px;
+    }
+#endScreen {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  z-index: 10;
+  font-family: 'Press Start 2P', cursive;
+  white-space: pre-wrap;
+  padding: 20px;
+  text-align: center;
+    }
+    /* Overlay for black fade */
+    #blackOverlay {
+      position: absolute;
+      top:0; left:0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      z-index: 7;
+    }
+    /* Text on top of black overlay */
+    #textOverlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      font-family: 'Press Start 2P', cursive;
+      text-align: center;
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      z-index: 8;
+      max-width: 80vw;
+    }
+  </style>
+</head>
+<body>
+
+<audio id="bgMusic" autoplay loop muted>
+  <source src="" type="audio/mpeg">
+</audio>
+<div id="startScreen">
+  <h1>Ready to Deliver the Jacket?</h1>
+  <h2>for better experience:</h2>
+  <h3>1.Play at night hour</h3>
+  <h4>2.turn off the light</h4>
+  <h5>3.Earphone/Max Volume</h5>
+  <h6>4.Tissue & Make sure youre alone</h6>
+  <button id="startBtn" disabled>Loading...</button>
+</div>
+
+<div id="endScreen">"</div>
+<div id="logo"></div>
+<div id="joystick">
+  <div id="stick"></div>
+</div>
+
+<div id="blackOverlay"></div>
+<div id="textOverlay"></div>
+<canvas id="game" width="640" height="360"></canvas>
+<div id="narratorBox">
+  <img id="narratorImg" src="Subject 5.png" alt="Narrator">
+  <div id="narratorText"></div>
+</div>
+<script>
+document.addEventListener("click", () => {
+  const music = document.getElementById("bgMusic");
+  music.muted = false;
+  music.play();
+});
+
+const narratorLines = [
+    "Hello, I'm your inner thoughts...Just keep steping foward!👾",
+    "Each step feels heavier 😮‍💨...But hey we dont know till we get there! 😎",
+    "Memories flood back with the jacket huh?🥹...first time?😭...dont worry he'll say thanks anyway 🙆‍♂️...",
+    "Just a little further now...its better than never yihaaa🐴.."
+  ];
+
+  let narratorIndex = 0;
+  const narratorText = document.getElementById("narratorText");
+
+  function typeNarratorLine(line, speed = 30) {
+    narratorText.textContent = "";
+    let i = 0;
+    function type() {
+      if (i < line.length) {
+        narratorText.textContent += line.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      }
+    }
+    type();
+  }
+
+  // Call this when you want to trigger a narrator message
+  function showNarratorLine(index) {
+    if (index < narratorLines.length) {
+      typeNarratorLine(narratorLines[index]);
+    }
+  }
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  const loadedImages = {
+    background: new Image(),
+    ground: new Image(),
+    idle: new Image(),
+    walk: [],
+    house: new Image()
+  };
+
+  loadedImages.background.src = "Home.JPG"; // your sky/scenery PNG
+  loadedImages.ground.src = "Ground.png";         // grass/dirt strip PNG
+
+  loadedImages.idle.src = "Subject 3.png";
+  ["Subject.png", "Subject 2.png", "Subject.png"].forEach((src, i) => {
+    const img = new Image();
+    img.src = src;
+    loadedImages.walk[i] = img;
+  });
+  loadedImages.house.src = "Subject 4.png";
+
+  let loadedCount = 0;
+  const totalImages = 7;  // 5 original + 2 new
+
+  const startBtn = document.getElementById("startBtn");
+  startBtn.disabled = true;
+
+  function imageLoaded() {
+    loadedCount++;
+    if (loadedCount === totalImages) {
+      startBtn.disabled = false;
+      startBtn.textContent = "Start";
+    }
+  }
+
+  loadedImages.background.onload = imageLoaded;
+  loadedImages.ground.onload = imageLoaded;
+  loadedImages.idle.onload = imageLoaded;
+  loadedImages.house.onload = imageLoaded;
+  loadedImages.walk.forEach(img => img.onload = imageLoaded);
+
+  const girl = {
+    x: 50,
+    y: 260,
+    width: 32,
+    height: 48,
+    frameIndex: 0,
+    frameTimer: 0,
+    frameDelay: 10,
+    dir: "right",
+    moving: false,
+  };
+
+  const houseX = 550, houseY = 230;
+  let keys = {};
+  let joyX = 0;
+  let animationId;
+
+  function loadFrame() {
+    if (girl.moving) {
+      girl.frameTimer++;
+      if (girl.frameTimer >= girl.frameDelay) {
+        girl.frameTimer = 0;
+        girl.frameIndex = (girl.frameIndex + 1) % loadedImages.walk.length;
+      }
+    } else {
+      girl.frameIndex = 0;
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // DRAW BACKGROUND LAYER FIRST (fills entire canvas)
+    ctx.drawImage(loadedImages.background, 0, - 40, canvas.width, canvas.height);
+
+    // DRAW GROUND STRIP AT BOTTOM
+    ctx.drawImage(loadedImages.ground, 0, canvas.height - 0, canvas.width, 80);
+
+    // THEN DRAW HOUSE & GIRL ON TOP
+    ctx.drawImage(loadedImages.house, houseX, houseY+ 10, 80, 80);
+
+    ctx.save();
+    if (girl.dir === "left") {
+      ctx.translate(girl.x + girl.width / 2, girl.y);
+      ctx.scale(-1, 1);
+      ctx.drawImage(
+        girl.moving ? loadedImages.walk[girl.frameIndex] : loadedImages.idle,
+        -girl.width / 2,
+        0,
+        girl.width,
+        girl.height
+      );
+    } else {
+      ctx.drawImage(
+        girl.moving ? loadedImages.walk[girl.frameIndex] : loadedImages.idle,
+        girl.x,
+        girl.y,
+        girl.width,
+        girl.height
+      );
+    }
+    ctx.restore();
+  }
+
+  // New pause & fade text system
+  const steps = [
+    { x: 150, text: "2 august...It's almost time...still need to move on" },
+    { x: 250, text: "4 august...Will he...loves it?...ill missed this jacket tho" },
+    { x: 350, text: "6 august...its...Getting closer...I hate this...I still want to be together..." },
+    { x: 470, text: "8 august...im scared but...Just ahead...I need to find out myself💛" }
+  ];
+
+  let currentStep = 0;
+  let isPaused = false;
+
+  const blackOverlay = document.getElementById("blackOverlay");
+  const textOverlay = document.getElementById("textOverlay");
+
+  function pauseAndShowText(text, callback) {
+    isPaused = true;
+    // fade in black
+    blackOverlay.style.transition = "opacity 1s ease";
+    blackOverlay.style.opacity = 1;
+
+    setTimeout(() => {
+      textOverlay.textContent = text;
+      textOverlay.style.transition = "opacity 1s ease";
+      textOverlay.style.opacity = 1;
+
+      showNarratorLine(currentStep);
+
+      setTimeout(() => {
+        textOverlay.style.opacity = 0;
+        setTimeout(() => {
+          blackOverlay.style.opacity = 0;
+
+          setTimeout(() => {
+            isPaused = false;
+            if (callback) callback();
+          }, 1000);
+
+        }, 1000);
+
+      }, 5000);
+
+    }, 1000);
+  }
+
+  function update() {
+    if (isPaused) {
+      loadFrame();  // keep animation moving
+      draw();
+      animationId = requestAnimationFrame(update);
+      return;
+    }
+
+    girl.moving = false;
+
+    if (keys["ArrowRight"] || keys["d"] || joyX > 0.3) {
+      girl.x += 2;
+      girl.dir = "right";
+      girl.moving = true;
+    }
+    if (keys["ArrowLeft"] || keys["a"] || joyX < -0.3) {
+      girl.x -= 2;
+      girl.dir = "left";
+      girl.moving = true;
+    }
+
+    // pause and show text at steps
+    if (currentStep < steps.length && girl.x > steps[currentStep].x) {
+      pauseAndShowText(steps[currentStep].text, () => {
+        currentStep++;
+      });
+    }
+
+    if (girl.x > houseX - girl.width) {
+      endGame();
+      return;
+    }
+
+    loadFrame();
+    draw();
+    animationId = requestAnimationFrame(update);
+  }
+
+ function endGame() {
+  // Optional fade-out animation
+  blackOverlay.style.transition = "opacity 2s ease";
+  blackOverlay.style.opacity = 1;
+
+  setTimeout(() => {
+    window.location.href = "scene2.html"; // NEW SCENE FILE NAME
+  }, 2000);
+}
+
+  document.addEventListener("keydown", (e) => {
+    keys[e.key] = true;
+  });
+  document.addEventListener("keyup", (e) => {
+    keys[e.key] = false;
+  });
+
+  const joystick = document.getElementById("joystick");
+  const stick = document.getElementById("stick");
+  let dragging = false;
+
+  joystick.addEventListener("touchstart", () => dragging = true);
+
+  joystick.addEventListener("touchmove", (e) => {
+    if (!dragging) return;
+    const rect = joystick.getBoundingClientRect();
+    const touch = e.touches[0];
+    const dx = touch.clientX - rect.left - 50;
+    const dy = touch.clientY - rect.top - 50;
+    const dist = Math.min(Math.sqrt(dx * dx + dy * dy), 40);
+    const angle = Math.atan2(dy, dx);
+    const x = Math.cos(angle) * dist;
+    const y = Math.sin(angle) * dist;
+    stick.style.left = 30 + x + "px";
+    stick.style.top = 30 + y + "px";
+    joyX = x / 40;
+  });
+
+  joystick.addEventListener("touchend", () => {
+    dragging = false;
+    stick.style.left = "30px";
+    stick.style.top = "30px";
+    joyX = 0;
+  });
+
+  startBtn.addEventListener("click", () => {
+    document.getElementById("startScreen").style.display = "none";
+    update();
+  });
+
+</script>
+</body>
+</html>
